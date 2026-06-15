@@ -7,12 +7,14 @@ from plotly.subplots import make_subplots
 import os
 
 
+
+
+# ESTILIZACAO ------------------------------------------------------------------
 st.set_page_config(
     page_title="Edumetricas",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
 
 st.markdown("""
 <style>
@@ -80,12 +82,10 @@ st.markdown("""
         color: #1E3A6E !important;
     }
 
-    /* Título principal */
     h1 {
         color: #0F172A !important;
     }
 
-    /* Subtítulo / caption */
     [data-testid="stCaptionContainer"] {
         color: #334155 !important;
     }
@@ -96,28 +96,25 @@ st.markdown("""
         color: #000000 !important;
         font-weight: 700;
     }
-            
+
     div[data-testid="stSelectbox"][key="disc_aba2"] label {
         font-size: 20px !important;
         font-weight: 700 !important;
         color: #000000 !important;
     }
-            
-    /* valor principal da métrica */
+
     div[data-testid="stMetricValue"] {
         color: #0F172A !important;
         font-size: 26px !important;
         font-weight: 700 !important;
     }
 
-    /* label da métrica */
     div[data-testid="stMetricLabel"] {
         color: #0F172A !important;
         font-size: 14px !important;
         font-weight: 600 !important;
     }
 
-    /* delta (se existir) */
     div[data-testid="stMetricDelta"] {
         color: #64748B !important;
     }
@@ -131,7 +128,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# CONSTANTES ----------------------------------
+
+
+# CONSTANTES --------------------------------------------------------------------
 CORES_FAIXAS = {
     'Insuficiente': '#EF4444',
     'Básico':       '#F97316',
@@ -151,7 +150,9 @@ DISC_SAEB = {
 }
 
 
-# CARREGAMENTO DE DADOS -----------------------
+
+
+# CARREGAMENTO DE DADOS ---------------------------------------------------------
 @st.cache_data
 def carregar_dados():
     BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -181,25 +182,13 @@ def carregar_dados():
     }
     enem = enem[list(enem_map.keys())].dropna().rename(columns=enem_map)
     for c in enem.columns:
-        enem[c] = enem[c] / 100  # normaliza 0-1000 → 0-10
+        enem[c] = enem[c] / 100
 
     return df, saeb_br, saeb_uf, enem
 
-
 df_full, saeb_br, saeb_uf, enem = carregar_dados()
 
-# BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-# BASE     = os.path.join(BASE_DIR, 'data', 'internal')
-# # professores = pd.read_csv(os.path.join(BASE, 'professores.csv'))
-
-# # df_full = df_full.merge(
-# #     professores[['matricula', 'nome']].drop_duplicates('matricula'),
-# #     left_on='id_professor',
-# #     right_on='matricula',
-# #     how='left'
-# # ).rename(columns={'nome': 'nome_professor'})
-# df_prof = df_full.copy()
-
+# CONEXAO COM O DATASET DE PROFS PARA BUSCA DE INFORMACOES
 BASE_DIR    = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 BASE        = os.path.join(BASE_DIR, 'data', 'internal')
 professores = pd.read_csv(os.path.join(BASE, 'professores.csv'))
@@ -218,7 +207,9 @@ df_full = df_full.merge(
 ).drop(columns='id_prof_key', errors='ignore')
 
 
-# SIDEBAR -------------------------------------
+
+
+# SIDEBAR -----------------------------------------------------------------------
 with st.sidebar:
     st.markdown("""
         <div style="font-size:35px; font-weight:700; margin-bottom:10px; margin-top:-40px; text-align:center;">
@@ -246,7 +237,9 @@ with st.sidebar:
     st.markdown("---")
 
 
-# FILTROS -------------------------------------
+
+
+# FILTROS -----------------------------------------------------------------------
 df = df_full.copy()
 if serie_sel  != 'Todas': df = df[df['serie']            == serie_sel]
 if turma_sel  != 'Todas': df = df[df['turma']            == turma_sel]
@@ -254,7 +247,7 @@ if disc_sel   != 'Todas': df = df[df['disciplina']       == disc_sel]
 if faixa_sel  != 'Todas': df = df[df['faixa_desempenho'] == faixa_sel]
 
 
-# NAVBAR --------------------------------------
+# NAVBAR ------------------------------------------------------------------------
 aba1, aba2, aba3, aba4, aba5, aba6 = st.tabs([
     "Visão geral",
     "Desemp. por matéria",
@@ -265,7 +258,9 @@ aba1, aba2, aba3, aba4, aba5, aba6 = st.tabs([
 ])
 
 
-# ABA 1: VISAO GERAL --------------------------
+
+
+# ABA 1: VISAO GERAL ------------------------------------------------------------
 with aba1:
     st.markdown("# Visão geral do conjunto")
     filtro_desc = " · ".join(filter(lambda x: x != 'Todas', [serie_sel, turma_sel, disc_sel])) or "Escola completa"
@@ -399,7 +394,9 @@ with aba1:
     )
 
 
-# ABA 2: DESEMPENHO POR MATERIA ---------------
+
+
+# ABA 2: DESEMPENHO POR MATERIA -------------------------------------------------
 with aba2:
     st.markdown("# Desempenho por matéria")
 
@@ -506,7 +503,9 @@ with aba2:
     st.plotly_chart(fig_turma, width='stretch')
 
 
-# ABA 3: EVOLUÇÃO BIMESTRAL -------------------
+
+
+# ABA 3: EVOLUÇÃO BIMESTRAL -----------------------------------------------------
 with aba3:
     st.markdown("# Evolução bimestral")
 
@@ -596,7 +595,6 @@ with aba3:
     st.markdown('<br />')
 
 
-    # comparação entre duas turmas
     st.markdown('<div class="section-title">Comparar duas turmas</div>', unsafe_allow_html=True)
     turmas_disp_all = sorted(df_full['turma'].unique().tolist())
     ca, cb = st.columns(2)
@@ -641,7 +639,9 @@ with aba3:
     st.plotly_chart(fig_comp, width='stretch')
 
 
-# ABA 4: ESTATÍSTICAS NACIONAIS ---------------
+
+
+# ABA 4: STATS NACIONAIS --------------------------------------------------------
 with aba4:
     st.markdown("# Estatísticas nacionais")
     st.caption(f"Dados SAEB: 3º ano do ensino médio · UF da escola: **{UF_ESCOLA}**")
@@ -813,7 +813,9 @@ with aba4:
     )
 
 
-# ABA 5: ANÁLISE DE PROFESSORES ---------------
+
+
+# ABA 5: PROFESSORES -------------------------------------------------
 with aba5:
     CORES_PROF = [
         '#3B6FE0', '#F97316', '#22C55E', '#EF4444',
@@ -827,23 +829,6 @@ with aba5:
         </div>
     """, unsafe_allow_html=True)
 
-    # BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    # BASE = os.path.join(BASE_DIR, 'data', 'internal')
-
-    # professores = pd.read_csv(os.path.join(BASE, 'professores.csv'))
-
-    # df_full['matricula'] = df_full['matricula'].astype(str)
-    # professores['matricula'] = professores['matricula'].astype(str)
-    # professores['matricula'] = professores['matricula'].astype(str)
-    # df_prof = df_full.merge(
-    #     professores[['matricula', 'nome']].drop_duplicates('matricula'),
-    #     left_on='id_professor',
-    #     right_on='matricula',
-    #     how='left'
-    # ).rename(columns={'nome': 'nome_professor'})
-
-    # df_prof_base = df_prof.copy()
-
     df_prof      = df_full.copy()
     df_prof_base = df_prof.copy()
 
@@ -856,7 +841,6 @@ with aba5:
     if disc_prof_sel != 'Todas':
         df_prof_base = df_prof_base[df_prof_base['disciplina'] == disc_prof_sel]
 
-    # Tabela resumo por professor
     resumo_prof = df_prof_base.groupby('nome_professor').agg(
         Disciplina      = ('disciplina', 'first'),
         Turmas          = ('turma', lambda x: ', '.join(sorted(x.unique()))),
@@ -872,7 +856,7 @@ with aba5:
     resumo_prof['Média_Geral']    = resumo_prof['Média_Geral'].round(2)
     resumo_prof['Taxa_Aprovação'] = resumo_prof['Taxa_Aprovação'].round(3)
 
-    # ── Ranking visual ──────────────────────────────────────────────────────
+
     st.markdown('<div class="section-title">Ranking de desempenho</div>', unsafe_allow_html=True)
 
     fig_rank = px.bar(
@@ -896,7 +880,7 @@ with aba5:
     )
     st.plotly_chart(fig_rank, width='stretch')
 
-    # ── Taxa de aprovação por professor ─────────────────────────────────────
+
     st.markdown('<div class="section-title">Taxa de aprovação por professor</div>', unsafe_allow_html=True)
 
     fig_aprov = px.bar(
@@ -918,7 +902,7 @@ with aba5:
     )
     st.plotly_chart(fig_aprov, width='stretch')
 
-    # ── Tabela detalhada ────────────────────────────────────────────────────
+    
     st.markdown('<div class="section-title">Tabela detalhada</div>', unsafe_allow_html=True)
 
     tabela_exib = resumo_prof[[
@@ -946,7 +930,7 @@ with aba5:
         width='stretch', hide_index=True
     )
 
-    # ── Comparar dois professores ────────────────────────────────────────────
+
     st.markdown('<div class="section-title">Comparar dois professores</div>', unsafe_allow_html=True)
 
     profs_lista = sorted(df_prof['nome_professor'].dropna().unique().tolist())
@@ -963,7 +947,6 @@ with aba5:
         prof_b: dados_bim_prof(prof_b),
     }, index=BIMESTRES)
 
-    # Informações complementares
     def info_prof(prof_nome):
         sub = df_prof[df_prof['nome_professor'] == prof_nome]
         return {
@@ -995,6 +978,7 @@ with aba5:
         """, unsafe_allow_html=True)
 
     st.markdown('<br />')
+
     fig_cmp_prof = go.Figure()
     for col, cor in [(prof_a, '#3B6FE0'), (prof_b, '#F97316')]:
         fig_cmp_prof.add_trace(go.Scatter(
@@ -1010,7 +994,7 @@ with aba5:
     )
     st.plotly_chart(fig_cmp_prof, width='stretch')
 
-    # Distribuição de faixas dos alunos de cada professor comparado
+
     st.markdown('<div class="section-title">Distribuição de faixas de desempenho</div>', unsafe_allow_html=True)
     faixas_cmp = []
     for prof_id in [prof_a, prof_b]:
@@ -1034,17 +1018,7 @@ with aba5:
 
 
 
-
-
-
-
-
-
-
-
-
-
-# ABA 6: PERFIL DO ALUNO ----------------------
+# ABA 6: PERFIL DO ALUNO --------------------------------------------------------
 with aba6:
     st.markdown("# Perfil do aluno")
     st.markdown("""
@@ -1073,14 +1047,12 @@ with aba6:
         st.info("Selecione um aluno acima para ver o perfil completo.")
         st.stop()
 
-    # Dados do aluno selecionado (todas as disciplinas)
     df_aluno = df_full[df_full['nome'] == aluno_sel].copy()
 
     if df_aluno.empty:
         st.warning("Aluno não encontrado.")
         st.stop()
 
-    # Dados demográficos (iguais em todas as linhas)
     info = df_aluno.iloc[0]
     matricula       = info['matricula']
     turma_aluno     = info['turma']
@@ -1088,7 +1060,6 @@ with aba6:
     genero_aluno    = 'Masculino' if info['genero'] == 'M' else 'Feminino'
     nascimento      = pd.to_datetime(info['data_nascimento']).strftime('%d/%m/%Y') if pd.notna(info['data_nascimento']) else '—'
 
-    # Média geral (média das médias anuais por disciplina)
     media_geral_aluno   = df_aluno['media_anual'].mean()
     freq_media_aluno    = df_aluno['frequencia_anual'].mean()
     ativ_media_aluno    = df_aluno['taxa_atividades_anual'].mean()
@@ -1100,7 +1071,7 @@ with aba6:
     badge_class = 'badge-green' if situacao_geral == 'Aprovado' else (
                 'badge-yellow' if situacao_geral == 'Parcialmente aprovado' else 'badge-red')
 
-    # ── Cabeçalho do aluno ──────────────────────────────────────────────────
+
     st.markdown(f"""
     <div class="aluno-header">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
@@ -1129,7 +1100,8 @@ with aba6:
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Situação por disciplina ──────────────────────────────────────────────
+
+    # SITUACAO POR DISCIPLINA
     st.markdown('<div class="section-title">Situação por disciplina</div>', unsafe_allow_html=True)
 
     disc_cols = st.columns(len(df_aluno))
@@ -1158,7 +1130,8 @@ with aba6:
 
     st.markdown('<br />')
 
-    # ── Radar de desempenho ──────────────────────────────────────────────────
+
+    # GRAFICO RADAR
     st.markdown('<div class="section-title">Radar de desempenho por disciplina</div>', unsafe_allow_html=True)
 
     c_radar, c_evolucao = st.columns([1, 1.6])
@@ -1166,7 +1139,6 @@ with aba6:
     with c_radar:
         disciplinas_radar = df_aluno.sort_values('disciplina')['disciplina'].tolist()
         medias_radar      = df_aluno.sort_values('disciplina')['media_anual'].tolist()
-        # Fecha o polígono
         disciplinas_radar_fechado = disciplinas_radar + [disciplinas_radar[0]]
         medias_radar_fechado      = medias_radar + [medias_radar[0]]
 
@@ -1181,7 +1153,6 @@ with aba6:
             name=aluno_sel,
         ))
 
-        # Linha de referência de aprovação
         fig_radar.add_trace(go.Scatterpolar(
             r=[LIMITE_APROV] * (len(disciplinas_radar) + 1),
             theta=disciplinas_radar_fechado,
@@ -1199,8 +1170,9 @@ with aba6:
         )
         st.plotly_chart(fig_radar, width='stretch')
 
+
+    # GRAFICO TEMPORAL ANO ALUNO
     with c_evolucao:
-        # Evolução bimestral por disciplina
         ev_aluno_rows = []
         for _, row_d in df_aluno.iterrows():
             for bim_label, col_m in zip(BIMESTRES, COLS_MEDIA):
@@ -1227,7 +1199,7 @@ with aba6:
         )
         st.plotly_chart(fig_ev_aluno, width='stretch')
 
-    # ── Detalhamento de provas ───────────────────────────────────────────────
+
     st.markdown('<div class="section-title">Notas por prova e bimestre</div>', unsafe_allow_html=True)
 
     st.markdown("""
@@ -1268,7 +1240,7 @@ with aba6:
     )
     st.plotly_chart(fig_provas_aluno, width='stretch')
 
-    # Mini-cards de atividades e faltas por bimestre
+
     st.markdown('<div class="section-title">Atividades e frequência por bimestre</div>', unsafe_allow_html=True)
 
     cols_mini = st.columns(4)
@@ -1295,7 +1267,8 @@ with aba6:
 
     st.markdown('<br />')
 
-    # ── Comparação com a turma ───────────────────────────────────────────────
+
+    # COMPARACAO COM RESTO DO CONJUNTO
     st.markdown('<div class="section-title">Comparação com a turma e escola</div>', unsafe_allow_html=True)
     st.caption(f"Turma {turma_aluno} · {serie_aluno}")
 
