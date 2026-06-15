@@ -30,14 +30,14 @@ Nesse processo, foi fundamental identificar e separar dois tipos principais de d
 
 Essa etapa foi essencial para garantir que o projeto fosse viável e que as análises propostas pudessem realmente gerar insights relevantes.
 
-Quanto aos dados internos, tem-se:
+O objetivo é pegar os dados próprios da escola, do conjunto de turmas do ensino médio, e gerar um sistema de análise, não só para comparação do grupo com dados de desempenho nacional, mas também para acompanhamento individual do desenvolvimento de cada aluno.
 
 --- 
 
 ## Descrição dos dados
 
 ### 1-) Dados internos
-Tem-se os seguintes datasets `(data/internal)`:
+Tem-se os seguintes datasets [caminho: `(data/internal)`]:
 - `alunos.csv`: contém informações identificadoras de cada um, tendo-se os campos: matrícula, nome, série, turma, gênero e data de nascimento.
 - `professores.csv`: informações identificadoras do corpo docente.
 - `linguagens.csv`
@@ -50,7 +50,7 @@ Os datasets de disciplinas possuem dados por aluno com suas notas, faltas e entr
 As disciplinas também possuem o registro de qual professor ministrou cada semestre, para análise de desempenho docente.
 
 ### 2-) Dados externos
-Para comparações, foram utilizados os seguintes conjuntos de dados `(data/external)`:
+Para comparações, foram utilizados os seguintes conjuntos de dados [caminho: `(data/external)`]:
 - `br_inep_saeb_brasil.csv`: dados de níveis de aprendizado do SAEB a nível nacional, inclui tanto a esfera privada quanto pública.
 - `br_inep_saeb_uf.csv`: dados de níveis de aprendizado do SAEB, organizados por estado e disciplina (Língua Portuguesa e Matemática), inclui tanto a esfera privada quanto pública.
 - `enem_2024_amostra.csv`: amostra com os resultados de 10.000 participantes do Enem 2024.
