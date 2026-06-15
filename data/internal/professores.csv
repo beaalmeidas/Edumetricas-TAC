@@ -1,0 +1,49 @@
+matricula,nome,disciplina,turma,serie
+P001,Prof. Ricardo Alves,Matemática,1ºA,1º Ano
+P001,Prof. Ricardo Alves,Matemática,1ºB,1º Ano
+P001,Prof. Ricardo Alves,Matemática,1ºC,1º Ano
+P001,Prof. Ricardo Alves,Matemática,1ºD,1º Ano
+P002,Profa. Sandra Melo,Matemática,2ºA,2º Ano
+P002,Profa. Sandra Melo,Matemática,2ºB,2º Ano
+P002,Profa. Sandra Melo,Matemática,2ºC,2º Ano
+P002,Profa. Sandra Melo,Matemática,2ºD,2º Ano
+P003,Prof. Tiago Rocha,Matemática,3ºA,3º Ano
+P003,Prof. Tiago Rocha,Matemática,3ºB,3º Ano
+P003,Prof. Tiago Rocha,Matemática,3ºC,3º Ano
+P003,Prof. Tiago Rocha,Matemática,3ºD,3º Ano
+P004,Profa. Camila Nunes,Linguagens,1ºA,1º Ano
+P004,Profa. Camila Nunes,Linguagens,1ºB,1º Ano
+P004,Profa. Camila Nunes,Linguagens,1ºC,1º Ano
+P004,Profa. Camila Nunes,Linguagens,1ºD,1º Ano
+P005,Prof. Fábio Lima,Linguagens,2ºA,2º Ano
+P005,Prof. Fábio Lima,Linguagens,2ºB,2º Ano
+P005,Prof. Fábio Lima,Linguagens,2ºC,2º Ano
+P005,Prof. Fábio Lima,Linguagens,2ºD,2º Ano
+P006,Profa. Renata Souza,Linguagens,3ºA,3º Ano
+P006,Profa. Renata Souza,Linguagens,3ºB,3º Ano
+P006,Profa. Renata Souza,Linguagens,3ºC,3º Ano
+P006,Profa. Renata Souza,Linguagens,3ºD,3º Ano
+P007,Prof. Leonardo Pinto,Ciências da Natureza,1ºA,1º Ano
+P007,Prof. Leonardo Pinto,Ciências da Natureza,1ºB,1º Ano
+P007,Prof. Leonardo Pinto,Ciências da Natureza,1ºC,1º Ano
+P007,Prof. Leonardo Pinto,Ciências da Natureza,1ºD,1º Ano
+P008,Profa. Juliana Reis,Ciências da Natureza,2ºA,2º Ano
+P008,Profa. Juliana Reis,Ciências da Natureza,2ºB,2º Ano
+P008,Profa. Juliana Reis,Ciências da Natureza,2ºC,2º Ano
+P008,Profa. Juliana Reis,Ciências da Natureza,2ºD,2º Ano
+P009,Prof. Marcelo Costa,Ciências da Natureza,3ºA,3º Ano
+P009,Prof. Marcelo Costa,Ciências da Natureza,3ºB,3º Ano
+P009,Prof. Marcelo Costa,Ciências da Natureza,3ºC,3º Ano
+P009,Prof. Marcelo Costa,Ciências da Natureza,3ºD,3º Ano
+P010,Profa. Aline Ferreira,Ciências Humanas,1ºA,1º Ano
+P010,Profa. Aline Ferreira,Ciências Humanas,1ºB,1º Ano
+P010,Profa. Aline Ferreira,Ciências Humanas,1ºC,1º Ano
+P010,Profa. Aline Ferreira,Ciências Humanas,1ºD,1º Ano
+P011,Prof. Bruno Gomes,Ciências Humanas,2ºA,2º Ano
+P011,Prof. Bruno Gomes,Ciências Humanas,2ºB,2º Ano
+P011,Prof. Bruno Gomes,Ciências Humanas,2ºC,2º Ano
+P011,Prof. Bruno Gomes,Ciências Humanas,2ºD,2º Ano
+P012,Profa. Patrícia Silva,Ciências Humanas,3ºA,3º Ano
+P012,Profa. Patrícia Silva,Ciências Humanas,3ºB,3º Ano
+P012,Profa. Patrícia Silva,Ciências Humanas,3ºC,3º Ano
+P012,Profa. Patrícia Silva,Ciências Humanas,3ºD,3º Ano
