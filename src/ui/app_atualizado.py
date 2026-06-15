@@ -80,12 +80,10 @@ st.markdown("""
         color: #1E3A6E !important;
     }
 
-    /* Título principal */
     h1 {
         color: #0F172A !important;
     }
 
-    /* Subtítulo / caption */
     [data-testid="stCaptionContainer"] {
         color: #334155 !important;
     }
@@ -103,21 +101,18 @@ st.markdown("""
         color: #000000 !important;
     }
             
-    /* valor principal da métrica */
     div[data-testid="stMetricValue"] {
         color: #0F172A !important;
         font-size: 26px !important;
         font-weight: 700 !important;
     }
 
-    /* label da métrica */
     div[data-testid="stMetricLabel"] {
         color: #0F172A !important;
         font-size: 14px !important;
         font-weight: 600 !important;
     }
 
-    /* delta (se existir) */
     div[data-testid="stMetricDelta"] {
         color: #64748B !important;
     }
@@ -126,6 +121,87 @@ st.markdown("""
         color: #000000 !important;
         font-size: 16px !important;
         font-weight: 500 !important;
+    }
+
+    /* Cartão de perfil de professor */
+    .prof-card {
+        background: #F8FAFF;
+        border: 1px solid #E2E8F8;
+        border-radius: 14px;
+        padding: 20px 24px;
+    }
+    .prof-card .prof-id {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #1E3A6E;
+    }
+    .prof-card .prof-disc {
+        font-size: 14px;
+        color: #64748B;
+        margin-top: 2px;
+    }
+    .prof-card .prof-stat {
+        margin-top: 14px;
+        font-size: 13px;
+        color: #334155;
+    }
+    .prof-card .prof-stat b {
+        font-size: 22px;
+        font-family: 'Space Grotesk', sans-serif;
+        color: #0F172A;
+    }
+
+    /* Cartão de perfil do aluno */
+    .aluno-header {
+        background: linear-gradient(135deg, #1E3A6E 0%, #3B6FE0 100%);
+        border-radius: 16px;
+        padding: 28px 32px;
+        color: white;
+        margin-bottom: 24px;
+    }
+    .aluno-header .aluno-nome {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .aluno-header .aluno-sub {
+        font-size: 16px;
+        opacity: 0.85;
+    }
+    .aluno-header .aluno-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+    .badge-green  { background: #DCFCE7; color: #166534; }
+    .badge-red    { background: #FEE2E2; color: #991B1B; }
+    .badge-yellow { background: #FEF9C3; color: #854D0E; }
+
+    .mini-stat {
+        background: #F8FAFF;
+        border: 1px solid #E2E8F8;
+        border-radius: 10px;
+        padding: 14px 18px;
+        text-align: center;
+    }
+    .mini-stat .ms-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #64748B;
+        margin-bottom: 4px;
+    }
+    .mini-stat .ms-value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: #0F172A;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -149,6 +225,11 @@ DISC_SAEB = {
     'Matemática': 'MT',
     'Linguagens': 'LP',
 }
+
+CORES_PROF = [
+    '#3B6FE0','#F97316','#22C55E','#EF4444','#A855F7',
+    '#14B8A6','#F59E0B','#EC4899','#6366F1','#10B981','#F43F5E','#0EA5E9'
+]
 
 
 # CARREGAMENTO DE DADOS -----------------------
@@ -187,35 +268,6 @@ def carregar_dados():
 
 
 df_full, saeb_br, saeb_uf, enem = carregar_dados()
-
-# BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-# BASE     = os.path.join(BASE_DIR, 'data', 'internal')
-# # professores = pd.read_csv(os.path.join(BASE, 'professores.csv'))
-
-# # df_full = df_full.merge(
-# #     professores[['matricula', 'nome']].drop_duplicates('matricula'),
-# #     left_on='id_professor',
-# #     right_on='matricula',
-# #     how='left'
-# # ).rename(columns={'nome': 'nome_professor'})
-# df_prof = df_full.copy()
-
-BASE_DIR    = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-BASE        = os.path.join(BASE_DIR, 'data', 'internal')
-professores = pd.read_csv(os.path.join(BASE, 'professores.csv'))
-
-prof_lookup = (
-    professores[['matricula', 'nome']]
-    .drop_duplicates('matricula')
-    .rename(columns={'matricula': 'id_prof_key', 'nome': 'nome_professor'})
-)
-
-df_full = df_full.merge(
-    prof_lookup,
-    left_on='id_professor',
-    right_on='id_prof_key',
-    how='left'
-).drop(columns='id_prof_key', errors='ignore')
 
 
 # SIDEBAR -------------------------------------
@@ -257,11 +309,11 @@ if faixa_sel  != 'Todas': df = df[df['faixa_desempenho'] == faixa_sel]
 # NAVBAR --------------------------------------
 aba1, aba2, aba3, aba4, aba5, aba6 = st.tabs([
     "Visão geral",
-    "Desemp. por matéria",
+    "Desempenho por matéria",
     "Evolução bimestral",
-    "Stats nacionais",
-    "Professores",
-    "Aluno",
+    "Estatísticas nacionais",
+    "Análise de professores",
+    "Perfil do aluno",
 ])
 
 
@@ -276,12 +328,10 @@ with aba1:
     """, unsafe_allow_html=True)
 
     col1, col2, col3, col4, col5 = st.columns(5)
-    n_alunos   = df['id_aluno'].nunique()
+    n_alunos    = df['id_aluno'].nunique()
     media_geral = df['media_anual'].mean()
     freq_media  = df['frequencia_anual'].mean() * 100
-    em_risco = df[
-        df['media_anual'] < LIMITE_APROV
-    ]['id_aluno'].nunique()
+    em_risco    = df[df['media_anual'] < LIMITE_APROV]['id_aluno'].nunique()
     pct_aprov   = (df['situacao'] == 'Aprovado').mean() * 100
 
     for col, label, val, sub in zip(
@@ -304,7 +354,6 @@ with aba1:
 
     with c1:
         faixas = df['faixa_desempenho'].value_counts().reindex(FAIXAS_ORDEM).fillna(0)
-
         fig_pizza = px.pie(
             values=faixas.values,
             names=faixas.index,
@@ -312,19 +361,8 @@ with aba1:
             color_discrete_map=CORES_FAIXAS,
             hole=0.5,
         )
-
-        fig_pizza.update_traces(
-            textposition='inside',
-            textinfo='percent+label',
-            textfont_size=20
-        )
-
-        fig_pizza.update_layout(
-            legend=dict(font=dict(size=14)),
-            margin=dict(t=20, b=10, l=20, r=20),
-            height=420
-        )
-
+        fig_pizza.update_traces(textposition='inside', textinfo='percent+label', textfont_size=20)
+        fig_pizza.update_layout(legend=dict(font=dict(size=14)), margin=dict(t=20, b=10, l=20, r=20), height=420)
         st.plotly_chart(fig_pizza, width='stretch')
 
     with c2:
@@ -332,36 +370,15 @@ with aba1:
             df.groupby(['serie','disciplina'])['media_anual']
             .mean().round(2).unstack()
         )
-
         fig_heat = px.imshow(
-            media_heatmap,
-            text_auto=True,
-            color_continuous_scale='RdYlGn',
-            zmin=0, zmax=10,
-            labels=dict(x='Disciplina', y='Série', color='Média'),
-            height=420,
+            media_heatmap, text_auto=True,
+            color_continuous_scale='RdYlGn', zmin=0, zmax=10,
+            labels=dict(x='Disciplina', y='Série', color='Média'), height=420,
         )
-
-        fig_heat.update_layout(
-            margin=dict(t=10, b=10),
-            font=dict(size=16),
-        )
-
-        fig_heat.update_xaxes(
-            tickfont=dict(size=14),
-            title_font=dict(size=16)
-        )
-
-        fig_heat.update_yaxes(
-            tickfont=dict(size=14),
-            title_font=dict(size=16)
-        )
-
-        fig_heat.update_coloraxes(
-            colorbar_tickfont=dict(size=14),
-            colorbar_title_font=dict(size=16)
-        )
-
+        fig_heat.update_layout(margin=dict(t=10, b=10), font=dict(size=16))
+        fig_heat.update_xaxes(tickfont=dict(size=14), title_font=dict(size=16))
+        fig_heat.update_yaxes(tickfont=dict(size=14), title_font=dict(size=16))
+        fig_heat.update_coloraxes(colorbar_tickfont=dict(size=14), colorbar_title_font=dict(size=16))
         st.plotly_chart(fig_heat, width='stretch')
 
     st.markdown('<br />')
@@ -373,7 +390,8 @@ with aba1:
         color_discrete_map={
             'Aprovado': '#22C55E',
             'Recuperação': '#F59E0B',
-            'Reprovado': '#EF4444',
+            'Reprovado (nota)': '#EF4444',
+            'Reprovado (falta)': '#F97316',
         },
         orientation='h', height=300,
         labels={'n': 'Alunos', 'disciplina': '', 'situacao': 'Situação'},
@@ -409,18 +427,13 @@ with aba2:
         </div>
     """, unsafe_allow_html=True)
 
-    disc_aba2 = st.selectbox(
-        "",
-        sorted(df_full['disciplina'].unique()),
-        key='disc_aba2'
-    )
-
+    disc_aba2 = st.selectbox("", sorted(df_full['disciplina'].unique()), key='disc_aba2')
     df2 = df[df['disciplina'] == disc_aba2]
 
     c1, c2, c3 = st.columns(3)
     media_val = f"{df2['media_anual'].mean():.2f}"
-    freq_val = f"{df2['frequencia_anual'].mean()*100:.1f}%"
-    ativ_val = f"{df2['taxa_atividades_anual'].mean()*100:.1f}%"
+    freq_val  = f"{df2['frequencia_anual'].mean()*100:.1f}%"
+    ativ_val  = f"{df2['taxa_atividades_anual'].mean()*100:.1f}%"
 
     c1.markdown(f"""
         <div style="background: #F8FAFF; border: 1px solid #E2E8F8; border-radius: 12px; padding: 20px; text-align: center;">
@@ -445,7 +458,6 @@ with aba2:
 
     st.markdown('<br />')
 
-
     st.markdown('<div class="section-title">Distribuição das notas</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
 
@@ -463,7 +475,6 @@ with aba2:
 
     st.markdown('<br />')
 
-
     st.markdown('<div class="section-title">Notas por prova e bimestre</div>', unsafe_allow_html=True)
     provas_cols = {
         'P1 — 1º Bim': 'nota_p1_b1', 'P2 — 1º Bim': 'nota_p2_b1',
@@ -480,29 +491,23 @@ with aba2:
         textposition='outside',
     ))
     fig_provas.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red',
-                            annotation_text='Mínimo aprovação')
-    fig_provas.update_layout(height=320, margin=dict(t=10,b=10),
-                                yaxis=dict(range=[0,11]))
+                          annotation_text='Mínimo aprovação')
+    fig_provas.update_layout(height=320, margin=dict(t=10,b=10), yaxis=dict(range=[0,11]))
     st.plotly_chart(fig_provas, width='stretch')
 
     st.markdown('<br />')
 
     st.markdown('<div class="section-title">Desempenho por turma</div>', unsafe_allow_html=True)
-    media_turma = (
-        df2.groupby('turma')['media_anual'].mean().round(2).reset_index()
-    )
+    media_turma = df2.groupby('turma')['media_anual'].mean().round(2).reset_index()
     fig_turma = px.bar(
         media_turma.sort_values('turma'), x='turma', y='media_anual',
-        color='media_anual',
-        color_continuous_scale='RdYlGn',
-        range_color=[0, 10],
-        text='media_anual',
-        labels={'turma': 'Turma', 'media_anual': 'Média'},
+        color='media_anual', color_continuous_scale='RdYlGn', range_color=[0, 10],
+        text='media_anual', labels={'turma': 'Turma', 'media_anual': 'Média'},
     )
     fig_turma.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red')
     fig_turma.update_traces(texttemplate='%{text:.2f}', textposition='outside')
     fig_turma.update_layout(height=320, margin=dict(t=10,b=10),
-                                coloraxis_showscale=False, yaxis=dict(range=[0,11]))
+                             coloraxis_showscale=False, yaxis=dict(range=[0,11]))
     st.plotly_chart(fig_turma, width='stretch')
 
 
@@ -514,18 +519,14 @@ with aba3:
     with c1:
         st.markdown('<p style="font-size: 18px; color: #000000; margin-bottom: 10px;">Agrupar por:</p>', unsafe_allow_html=True)
         agrup = st.selectbox(
-            "Agrupar por",
-            ['Escola toda', 'Série', 'Turma', 'Disciplina'],
-            key='agrup_bim',
-            label_visibility="collapsed"
+            "Agrupar por", ['Escola toda', 'Série', 'Turma', 'Disciplina'],
+            key='agrup_bim', label_visibility="collapsed"
         )
     with c2:
         st.markdown('<p style="font-size: 18px; color: #000000; margin-bottom: 10px;">Métrica:</p>', unsafe_allow_html=True)
         metrica = st.selectbox(
-            "Métrica",
-            ['Média das notas', 'Frequência'],
-            key='metrica_bim',
-            label_visibility="collapsed"
+            "Métrica", ['Média das notas', 'Frequência'],
+            key='metrica_bim', label_visibility="collapsed"
         )
 
     cols_bim = COLS_MEDIA if metrica == 'Média das notas' else COLS_FREQ
@@ -555,20 +556,16 @@ with aba3:
     else:
         ev = build_evolucao(df, 'disciplina')
 
-    fig_ev = px.line(
-        ev, x='Bimestre', y=ylabel, color='Grupo',
-        markers=True,
-        labels={ylabel: ylabel, 'Bimestre': ''},
-    )
+    fig_ev = px.line(ev, x='Bimestre', y=ylabel, color='Grupo', markers=True,
+                     labels={ylabel: ylabel, 'Bimestre': ''})
     if metrica == 'Média das notas':
         fig_ev.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red',
-                            annotation_text='Mínimo aprovação')
+                          annotation_text='Mínimo aprovação')
     fig_ev.update_traces(line=dict(width=2.5), marker=dict(size=8))
     fig_ev.update_layout(height=420, margin=dict(t=20,b=10))
     st.plotly_chart(fig_ev, width='stretch')
 
     st.markdown('<br />')
-
 
     st.markdown('<div class="section-title">Variação entre bimestres</div>', unsafe_allow_html=True)
 
@@ -578,9 +575,9 @@ with aba3:
     else:
         pivot = ev.pivot(index='Grupo', columns='Bimestre', values=ylabel)[BIMESTRES]
 
-    pivot['Dif. 1° → 2°'] = (pivot['2º Bim'] - pivot['1º Bim']).round(2)
+    pivot['Dif. 1° → 2°']  = (pivot['2º Bim'] - pivot['1º Bim']).round(2)
     pivot['Dif.  2° → 3°'] = (pivot['3º Bim'] - pivot['2º Bim']).round(2)
-    pivot['Dif. 3° → 4°'] = (pivot['4º Bim'] - pivot['3º Bim']).round(2)
+    pivot['Dif. 3° → 4°']  = (pivot['4º Bim'] - pivot['3º Bim']).round(2)
 
     def color_delta(val):
         if isinstance(val, float):
@@ -595,27 +592,13 @@ with aba3:
 
     st.markdown('<br />')
 
-
-    # comparação entre duas turmas
     st.markdown('<div class="section-title">Comparar duas turmas</div>', unsafe_allow_html=True)
     turmas_disp_all = sorted(df_full['turma'].unique().tolist())
     ca, cb = st.columns(2)
     ca.markdown('<p style="font-size: 18px; color: #000000; margin-bottom: 10px;">Turma 1:</p>', unsafe_allow_html=True)
-    turma_a = ca.selectbox(
-        "Turma 1", 
-        turmas_disp_all, 
-        key='ta',
-        label_visibility="collapsed"
-    )
-
+    turma_a = ca.selectbox("Turma 1", turmas_disp_all, key='ta', label_visibility="collapsed")
     cb.markdown('<p style="font-size: 18px; color: #000000; margin-bottom: 10px;">Turma 2:</p>', unsafe_allow_html=True)
-    turma_b = cb.selectbox(
-        "Turma 2", 
-        turmas_disp_all, 
-        index=1, 
-        key='tb',
-        label_visibility="collapsed"
-    )
+    turma_b = cb.selectbox("Turma 2", turmas_disp_all, index=1, key='tb', label_visibility="collapsed")
 
     def media_bim_turma(turma):
         sub = df_full[df_full['turma'] == turma]
@@ -631,13 +614,11 @@ with aba3:
         fig_comp.add_trace(go.Scatter(
             x=df_comp.index, y=df_comp[col],
             name=col, mode='lines+markers',
-            line=dict(width=2.5, color=cor),
-            marker=dict(size=8),
+            line=dict(width=2.5, color=cor), marker=dict(size=8),
         ))
     if metrica == 'Média das notas':
         fig_comp.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red')
-    fig_comp.update_layout(height=340, margin=dict(t=10,b=10),
-                            yaxis_title=ylabel)
+    fig_comp.update_layout(height=340, margin=dict(t=10,b=10), yaxis_title=ylabel)
     st.plotly_chart(fig_comp, width='stretch')
 
 
@@ -667,24 +648,19 @@ with aba4:
     for col, cor, dash in [('Brasil','#3B6FE0','solid'), (UF_ESCOLA,'#F97316','dot')]:
         if col in hist.columns:
             fig_saeb.add_trace(go.Scatter(
-                x=hist['ano'], y=hist[col],
-                name=col, mode='lines+markers',
-                line=dict(width=2.5, color=cor, dash=dash),
-                marker=dict(size=7),
+                x=hist['ano'], y=hist[col], name=col, mode='lines+markers',
+                line=dict(width=2.5, color=cor, dash=dash), marker=dict(size=7),
             ))
     fig_saeb.update_layout(
         height=340, margin=dict(t=10,b=10),
-        xaxis_title='Ano',
-        yaxis_title='Proficiência média (escala SAEB)',
+        xaxis_title='Ano', yaxis_title='Proficiência média (escala SAEB)',
         legend=dict(orientation='h', y=-0.2)
     )
     st.plotly_chart(fig_saeb, width='stretch')
 
     st.markdown('<br />')
 
-
-    st.markdown('<div class="section-title">SAEB — Distribuição de níveis (2023)</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-title">SAEB — Distribuição de níveis (2023)</div>', unsafe_allow_html=True)
 
     nivel_cols = [f'nivel_{i}' for i in range(11)]
 
@@ -701,8 +677,8 @@ with aba4:
         row = sub.iloc[0]
         return [float(row.get(c, 0) or 0) for c in nivel_cols]
 
-    niveis_br  = get_niveis(saeb_br, cod_saeb)
-    niveis_uf  = get_niveis(saeb_uf, cod_saeb)
+    niveis_br = get_niveis(saeb_br, cod_saeb)
+    niveis_uf = get_niveis(saeb_uf, cod_saeb)
 
     disc_key_map = {'Matemática': 'matematica', 'Linguagens': 'linguagens'}
     dk = disc_key_map.get(disc_saeb)
@@ -724,8 +700,7 @@ with aba4:
 
     fig_niv.update_layout(
         barmode='group', height=340, margin=dict(t=10,b=10),
-        xaxis_title='Nível de proficiência',
-        yaxis_title='% de alunos',
+        xaxis_title='Nível de proficiência', yaxis_title='% de alunos',
         legend=dict(orientation='h', y=-0.2),
         xaxis=dict(tickvals=x, ticktext=[str(i) for i in x])
     )
@@ -733,33 +708,29 @@ with aba4:
 
     st.markdown('<br />')
 
-
-    st.markdown('<div class="section-title">ENEM — Escola vs Nacional</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-title">ENEM — Escola vs Nacional</div>', unsafe_allow_html=True)
     st.caption("Notas ENEM normalizadas para escala 0–10 (÷ 100) para comparação direta.")
 
     disc_enem_opts = [d for d in enem.columns if d in df_full['disciplina'].unique()]
     disc_enem = st.selectbox("Disciplina ENEM", disc_enem_opts, key='disc_enem')
 
     disc_key_enem = {
-        'Matemática': 'matematica',
-        'Linguagens': 'linguagens',
-        'Ciências da Natureza': 'ciencias_natureza',
-        'Ciências Humanas': 'ciencias_humanas',
+        'Matemática':          'matematica',
+        'Linguagens':          'linguagens',
+        'Ciências da Natureza':'ciencias_natureza',
+        'Ciências Humanas':    'ciencias_humanas',
     }
-    dk_enem = disc_key_enem.get(disc_enem)
+    dk_enem     = disc_key_enem.get(disc_enem)
     escola_vals = df_full[df_full['disciplina_key'] == dk_enem]['media_anual'] if dk_enem else pd.Series()
     enem_vals   = enem[disc_enem].dropna()
 
     fig_enem = go.Figure()
     fig_enem.add_trace(go.Histogram(
-        x=escola_vals, name='Escola',
-        marker_color='#3B6FE0', opacity=0.7,
+        x=escola_vals, name='Escola', marker_color='#3B6FE0', opacity=0.7,
         xbins=dict(size=0.5), histnorm='percent'
     ))
     fig_enem.add_trace(go.Histogram(
-        x=enem_vals, name='ENEM 2024',
-        marker_color='#F97316', opacity=0.7,
+        x=enem_vals, name='ENEM 2024', marker_color='#F97316', opacity=0.7,
         xbins=dict(size=0.5), histnorm='percent'
     ))
     fig_enem.add_vline(x=escola_vals.mean(), line_dash='dash', line_color='#3B6FE0',
@@ -768,8 +739,7 @@ with aba4:
                         annotation_text=f'ENEM: {enem_vals.mean():.2f}')
     fig_enem.update_layout(
         barmode='overlay', height=380, margin=dict(t=10,b=10),
-        xaxis_title='Nota (0–10)',
-        yaxis_title='% de alunos',
+        xaxis_title='Nota (0–10)', yaxis_title='% de alunos',
         legend=dict(orientation='h', y=-0.2)
     )
     st.plotly_chart(fig_enem, width='stretch')
@@ -792,34 +762,17 @@ with aba4:
 
     df_comp_tab = pd.DataFrame(comp_rows)
 
-    def color_diff(val):
-        if isinstance(val, float):
-            return f"color: {'#22C55E' if val > 0 else '#EF4444'}; font-weight:600"
-        return ''
-
     def format_diff(val):
-        if val > 0:
-            return f"🟢 {val}"
-        elif val < 0:
-            return f"🔴 {val}"
+        if val > 0: return f"🟢 {val}"
+        elif val < 0: return f"🔴 {val}"
         return f"⚪ {val}"
 
     df_comp_tab['Diferença'] = df_comp_tab['Diferença'].apply(format_diff)
-
-    st.dataframe(
-        df_comp_tab,
-        width='stretch',
-        hide_index=True
-    )
+    st.dataframe(df_comp_tab, width='stretch', hide_index=True)
 
 
 # ABA 5: ANÁLISE DE PROFESSORES ---------------
 with aba5:
-    CORES_PROF = [
-        '#3B6FE0', '#F97316', '#22C55E', '#EF4444',
-        '#A855F7', '#14B8A6', '#F59E0B', '#64748B'
-    ]
-
     st.markdown("# Análise de professores")
     st.markdown("""
         <div style="font-size:17px; color:#475569; margin-bottom:24px; margin-top:-12px;">
@@ -827,37 +780,18 @@ with aba5:
         </div>
     """, unsafe_allow_html=True)
 
-    # BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    # BASE = os.path.join(BASE_DIR, 'data', 'internal')
-
-    # professores = pd.read_csv(os.path.join(BASE, 'professores.csv'))
-
-    # df_full['matricula'] = df_full['matricula'].astype(str)
-    # professores['matricula'] = professores['matricula'].astype(str)
-    # professores['matricula'] = professores['matricula'].astype(str)
-    # df_prof = df_full.merge(
-    #     professores[['matricula', 'nome']].drop_duplicates('matricula'),
-    #     left_on='id_professor',
-    #     right_on='matricula',
-    #     how='left'
-    # ).rename(columns={'nome': 'nome_professor'})
-
-    # df_prof_base = df_prof.copy()
-
-    df_prof      = df_full.copy()
-    df_prof_base = df_prof.copy()
-
+    # Filtro de disciplina para esta aba
     disc_prof_opts = ['Todas'] + sorted(df_full['disciplina'].unique().tolist())
     col_filt1, col_filt2 = st.columns([1, 3])
     with col_filt1:
         disc_prof_sel = st.selectbox("Filtrar por disciplina", disc_prof_opts, key='disc_prof')
 
-    df_prof_base = df_prof.copy()
+    df_prof_base = df_full.copy()
     if disc_prof_sel != 'Todas':
         df_prof_base = df_prof_base[df_prof_base['disciplina'] == disc_prof_sel]
 
     # Tabela resumo por professor
-    resumo_prof = df_prof_base.groupby('nome_professor').agg(
+    resumo_prof = df_prof_base.groupby('id_professor').agg(
         Disciplina      = ('disciplina', 'first'),
         Turmas          = ('turma', lambda x: ', '.join(sorted(x.unique()))),
         Alunos          = ('id_aluno', 'nunique'),
@@ -867,7 +801,7 @@ with aba5:
         Média_B2        = ('media_b2', 'mean'),
         Média_B3        = ('media_b3', 'mean'),
         Média_B4        = ('media_b4', 'mean'),
-    ).reset_index().rename(columns={'nome_professor': 'Professor'})
+    ).reset_index().rename(columns={'id_professor': 'Professor'})
 
     resumo_prof['Média_Geral']    = resumo_prof['Média_Geral'].round(2)
     resumo_prof['Taxa_Aprovação'] = resumo_prof['Taxa_Aprovação'].round(3)
@@ -918,6 +852,62 @@ with aba5:
     )
     st.plotly_chart(fig_aprov, width='stretch')
 
+    # ── Heatmap professor × turma ───────────────────────────────────────────
+    st.markdown('<div class="section-title">Média por professor e turma</div>', unsafe_allow_html=True)
+    st.caption("Cada célula mostra a média anual dos alunos daquela turma com aquele professor.")
+
+    heat_data = df_full.groupby(['id_professor','turma'])['media_anual'].mean().round(2).unstack()
+
+    fig_heat_pt = px.imshow(
+        heat_data,
+        text_auto=True,
+        color_continuous_scale='RdYlGn',
+        zmin=0, zmax=10,
+        labels=dict(x='Turma', y='Professor', color='Média'),
+        height=460,
+    )
+    fig_heat_pt.update_layout(margin=dict(t=10, b=10), font=dict(size=13))
+    fig_heat_pt.update_xaxes(tickfont=dict(size=13))
+    fig_heat_pt.update_yaxes(tickfont=dict(size=13))
+    st.plotly_chart(fig_heat_pt, width='stretch')
+
+    # ── Evolução bimestral por professor ────────────────────────────────────
+    st.markdown('<div class="section-title">Evolução bimestral por professor</div>', unsafe_allow_html=True)
+
+    bim_cols_prof = ['Média_B1','Média_B2','Média_B3','Média_B4']
+    ev_prof = resumo_prof.melt(
+        id_vars='Professor', value_vars=bim_cols_prof,
+        var_name='Bimestre', value_name='Média'
+    )
+    ev_prof['Bimestre'] = ev_prof['Bimestre'].map({
+        'Média_B1': '1º Bim', 'Média_B2': '2º Bim',
+        'Média_B3': '3º Bim', 'Média_B4': '4º Bim'
+    })
+
+    # Mapeia cor fixa a cada professor
+    profs_sorted = sorted(resumo_prof['Professor'].unique())
+    cor_map_prof = {p: CORES_PROF[i % len(CORES_PROF)] for i, p in enumerate(profs_sorted)}
+
+    fig_ev_prof = go.Figure()
+    for _, row_p in resumo_prof.iterrows():
+        prof = row_p['Professor']
+        sub  = ev_prof[ev_prof['Professor'] == prof]
+        fig_ev_prof.add_trace(go.Scatter(
+            x=sub['Bimestre'], y=sub['Média'],
+            name=f"{prof} ({row_p['Disciplina'][:4]}…)" if len(row_p['Disciplina']) > 4 else f"{prof} ({row_p['Disciplina']})",
+            mode='lines+markers',
+            line=dict(width=2.5, color=cor_map_prof[prof]),
+            marker=dict(size=8),
+        ))
+    fig_ev_prof.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red',
+                           annotation_text='Mínimo aprovação')
+    fig_ev_prof.update_layout(
+        height=420, margin=dict(t=10, b=10),
+        yaxis=dict(range=[0, 11], title='Média'),
+        legend=dict(orientation='h', y=-0.25, font=dict(size=12)),
+    )
+    st.plotly_chart(fig_ev_prof, width='stretch')
+
     # ── Tabela detalhada ────────────────────────────────────────────────────
     st.markdown('<div class="section-title">Tabela detalhada</div>', unsafe_allow_html=True)
 
@@ -940,8 +930,8 @@ with aba5:
     st.dataframe(
         tabela_exib.style
             .format({'Média Geral': '{:.2f}', 'Tx. Aprovação': '{:.1%}',
-                    '1º Bim': '{:.2f}', '2º Bim': '{:.2f}',
-                    '3º Bim': '{:.2f}', '4º Bim': '{:.2f}'})
+                     '1º Bim': '{:.2f}', '2º Bim': '{:.2f}',
+                     '3º Bim': '{:.2f}', '4º Bim': '{:.2f}'})
             .map(cor_media, subset=['Média Geral','1º Bim','2º Bim','3º Bim','4º Bim']),
         width='stretch', hide_index=True
     )
@@ -949,13 +939,13 @@ with aba5:
     # ── Comparar dois professores ────────────────────────────────────────────
     st.markdown('<div class="section-title">Comparar dois professores</div>', unsafe_allow_html=True)
 
-    profs_lista = sorted(df_prof['nome_professor'].dropna().unique().tolist())
+    profs_lista = sorted(df_full['id_professor'].unique().tolist())
     cp1, cp2 = st.columns(2)
     prof_a = cp1.selectbox("Professor A", profs_lista, key='prof_a')
     prof_b = cp2.selectbox("Professor B", profs_lista, index=min(1, len(profs_lista)-1), key='prof_b')
 
-    def dados_bim_prof(prof_nome):
-        sub = df_prof[df_prof['nome_professor'] == prof_nome]
+    def dados_bim_prof(prof_id):
+        sub = df_full[df_full['id_professor'] == prof_id]
         return sub[['media_b1','media_b2','media_b3','media_b4']].mean().values
 
     df_cmp_prof = pd.DataFrame({
@@ -964,8 +954,8 @@ with aba5:
     }, index=BIMESTRES)
 
     # Informações complementares
-    def info_prof(prof_nome):
-        sub = df_prof[df_prof['nome_professor'] == prof_nome]
+    def info_prof(prof_id):
+        sub = df_full[df_full['id_professor'] == prof_id]
         return {
             'disciplina': sub['disciplina'].iloc[0],
             'turmas': ', '.join(sorted(sub['turma'].unique())),
@@ -1003,7 +993,7 @@ with aba5:
             line=dict(width=2.5, color=cor), marker=dict(size=9),
         ))
     fig_cmp_prof.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red',
-                            annotation_text='Mínimo aprovação')
+                             annotation_text='Mínimo aprovação')
     fig_cmp_prof.update_layout(
         height=340, margin=dict(t=10, b=10),
         yaxis=dict(range=[0, 11], title='Média'), xaxis_title=''
@@ -1014,7 +1004,7 @@ with aba5:
     st.markdown('<div class="section-title">Distribuição de faixas de desempenho</div>', unsafe_allow_html=True)
     faixas_cmp = []
     for prof_id in [prof_a, prof_b]:
-        sub = df_prof[df_prof['nome_professor'] == prof_id]
+        sub = df_full[df_full['id_professor'] == prof_id]
         counts = sub['faixa_desempenho'].value_counts(normalize=True).reindex(FAIXAS_ORDEM).fillna(0) * 100
         for faixa, pct in counts.items():
             faixas_cmp.append({'Professor': prof_id, 'Faixa': faixa, '%': round(pct, 1)})
@@ -1032,41 +1022,25 @@ with aba5:
     st.plotly_chart(fig_faixas_cmp, width='stretch')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 # ABA 6: PERFIL DO ALUNO ----------------------
 with aba6:
     st.markdown("# Perfil do aluno")
     st.markdown("""
         <div style="font-size:17px; color:#475569; margin-bottom:24px; margin-top:-12px;">
-        Avalie as métricas de um aluno individualmente.
+        Busque um aluno pelo nome ou matrícula para ver seu desempenho detalhado em todas as disciplinas.
         </div>
     """, unsafe_allow_html=True)
 
+    # ── Barra de busca ──────────────────────────────────────────────────────
     nomes_unicos = sorted(df_full['nome'].unique().tolist())
 
     busca_col, _ = st.columns([2, 2])
     with busca_col:
-        st.markdown("""
-            <div style="font-size:18px; font-weight:600; color:#0F172A; margin-bottom:-20px;">
-                Busque um aluno por nome ou matrícula:
-            </div>
-        """, unsafe_allow_html=True)
-
         aluno_sel = st.selectbox(
-            "",
+            "🔍  Buscar aluno (nome ou matrícula)",
             options=[''] + nomes_unicos,
             key='busca_aluno',
+            placeholder="Digite o nome do aluno...",
         )
 
     if not aluno_sel:
@@ -1095,10 +1069,10 @@ with aba6:
     n_aprovado          = (df_aluno['situacao'] == 'Aprovado').sum()
     n_total_disc        = len(df_aluno)
     situacao_geral      = 'Aprovado' if n_aprovado == n_total_disc else (
-                        'Parcialmente aprovado' if n_aprovado > 0 else 'Reprovado')
+                          'Parcialmente aprovado' if n_aprovado > 0 else 'Reprovado')
 
     badge_class = 'badge-green' if situacao_geral == 'Aprovado' else (
-                'badge-yellow' if situacao_geral == 'Parcialmente aprovado' else 'badge-red')
+                  'badge-yellow' if situacao_geral == 'Parcialmente aprovado' else 'badge-red')
 
     # ── Cabeçalho do aluno ──────────────────────────────────────────────────
     st.markdown(f"""
@@ -1138,21 +1112,22 @@ with aba6:
         media_disc = row_d['media_anual']
         sit_disc   = row_d['situacao']
         faixa_disc = row_d['faixa_desempenho']
-        prof_disc = row_d.get('nome_professor', '—')
+        prof_disc  = row_d['id_professor']
 
         if sit_disc == 'Aprovado':
-            bg, fg = '#DCFCE7', '#166534'
+            bg, fg, emoji = '#DCFCE7', '#166534', '✅'
         elif 'falta' in sit_disc.lower():
-            bg, fg = '#FEF9C3', '#854D0E'
+            bg, fg, emoji = '#FEF9C3', '#854D0E', '⚠️'
         else:
-            bg, fg = '#FEE2E2', '#991B1B'
+            bg, fg, emoji = '#FEE2E2', '#991B1B', '❌'
 
         disc_cols[i].markdown(f"""
         <div style="background:{bg}; border-radius:12px; padding:16px 14px; text-align:center;">
             <div style="font-size:13px; font-weight:700; color:{fg}; text-transform:uppercase; letter-spacing:.04em;">{disc_nome}</div>
             <div style="font-size:32px; font-weight:700; color:#0F172A; font-family:'Space Grotesk',sans-serif; margin:8px 0;">{media_disc:.2f}</div>
             <div style="font-size:12px; color:#475569;">{faixa_disc}</div>
-            <div style="font-size:12px; color:#64748B; margin-top:4px;">{prof_disc}</div>
+            <div style="font-size:12px; color:#64748B; margin-top:4px;">Prof. {prof_disc}</div>
+            <div style="font-size:18px; margin-top:6px;">{emoji} {sit_disc}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1230,18 +1205,11 @@ with aba6:
     # ── Detalhamento de provas ───────────────────────────────────────────────
     st.markdown('<div class="section-title">Notas por prova e bimestre</div>', unsafe_allow_html=True)
 
-    st.markdown("""
-    <div style="font-size:18px; color:#0F172A; margin-bottom:-20px;">
-    Selecione a disciplina para ver as notas individuais:
-    </div>
-    """, unsafe_allow_html=True)
-
     disc_detalhe_sel = st.selectbox(
-        "",
+        "Selecione a disciplina para ver as notas individuais:",
         sorted(df_aluno['disciplina'].unique()),
         key='disc_detalhe_aluno'
     )
-
     row_disc = df_aluno[df_aluno['disciplina'] == disc_detalhe_sel].iloc[0]
 
     provas_map = {
@@ -1284,12 +1252,12 @@ with aba6:
 
         cols_mini[i].markdown(f"""
         <div style="background:#F8FAFF; border:1px solid #E2E8F8; border-radius:12px; padding:16px 14px; text-align:center;">
-            <div style="font-size:16px; font-weight:700; color:#1E3A6E; margin-bottom:10px;">{bim_label}</div>
+            <div style="font-size:14px; font-weight:700; color:#1E3A6E; margin-bottom:10px;">{bim_label}</div>
             <div style="font-size:26px; font-weight:700; color:{cor_m}; font-family:'Space Grotesk',sans-serif;">{media_b:.2f}</div>
-            <div style="font-size:14px; color:#64748B; margin-top:2px;">média do bimestre</div>
+            <div style="font-size:11px; color:#64748B; margin-top:2px;">média do bimestre</div>
             <hr style="border:none; border-top:1px solid #E2E8F8; margin:10px 0;">
-            <div style="font-size:14px; color:#475569;">Atividades: <b>{entregues}/{total_a}</b> ({taxa_a:.0%})</div>
-            <div style="font-size:14px; color:#475569; margin-top:4px;">Faltas: <b>{faltas}</b> / {aulas} aulas ({freq_b:.0%} presença)</div>
+            <div style="font-size:12px; color:#475569;">📋 Atividades: <b>{entregues}/{total_a}</b> ({taxa_a:.0%})</div>
+            <div style="font-size:12px; color:#475569; margin-top:4px;">📅 Faltas: <b>{faltas}</b> / {aulas} aulas ({freq_b:.0%} presença)</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1330,7 +1298,7 @@ with aba6:
         ))
 
     fig_comp_aluno.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red',
-                                annotation_text='Mínimo aprovação')
+                              annotation_text='Mínimo aprovação')
     fig_comp_aluno.update_layout(
         barmode='group', height=360, margin=dict(t=10, b=10),
         yaxis=dict(range=[0, 12], title='Média'),
