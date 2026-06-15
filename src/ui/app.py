@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import os
 
 # ─────────────────────────────────────────────
 # CONFIGURAÇÃO
@@ -98,15 +99,17 @@ DISC_SAEB = {
 # ─────────────────────────────────────────────
 @st.cache_data
 def carregar_dados():
-    BASE = '../../data/internal/'
-    EXT  = '../../data/external/'
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-    df = pd.read_csv(BASE + 'output/consolidado.csv', dtype={'id_aluno': str})
+    BASE = os.path.join(BASE_DIR, 'data', 'internal')
+    EXT  = os.path.join(BASE_DIR, 'data', 'external')
+
+    df = pd.read_csv(os.path.join(BASE, 'output', 'consolidado.csv'), dtype={'id_aluno': str})
     df['data_nascimento'] = pd.to_datetime(df['data_nascimento'], dayfirst=True, errors='coerce')
 
-    saeb_br = pd.read_csv(EXT + 'br_inep_saeb_brasil.csv')
-    saeb_uf = pd.read_csv(EXT + 'br_inep_saeb_uf.csv')
-    enem    = pd.read_csv(EXT + 'enem_2024_amostra.csv')
+    saeb_br = pd.read_csv(os.path.join(EXT, 'br_inep_saeb_brasil.csv'))
+    saeb_uf = pd.read_csv(os.path.join(EXT, 'br_inep_saeb_uf.csv'))
+    enem    = pd.read_csv(os.path.join(EXT, 'enem_2024_amostra.csv'))
 
     saeb_br = saeb_br[(saeb_br['ano'] >= 2013) & (saeb_br['serie'] == 12)].copy()
     saeb_uf = saeb_uf[
