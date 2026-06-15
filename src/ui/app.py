@@ -11,12 +11,11 @@ import os
 # ─────────────────────────────────────────────
 st.set_page_config(
     page_title="Edumetricas",
-    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# CSS customizado
+
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
@@ -33,11 +32,11 @@ st.markdown("""
         text-align: center;
     }
     .metric-card .label {
-        font-size: 12px;
+        font-size: 18px;
         font-weight: 600;
         letter-spacing: .08em;
         text-transform: uppercase;
-        color: #64748B;
+        color: #334155;
         margin-bottom: 6px;
     }
     .metric-card .value {
@@ -47,8 +46,8 @@ st.markdown("""
         color: #1E3A6E;
     }
     .metric-card .sub {
-        font-size: 12px;
-        color: #94A3B8;
+        font-size: 16px;
+        color: #475569; 
         margin-top: 4px;
     }
     .badge-aprovado    { background:#DCFCE7; color:#166534; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
@@ -57,7 +56,7 @@ st.markdown("""
 
     .section-title {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 18px;
+        font-size: 25px;
         font-weight: 700;
         color: #1E3A6E;
         border-left: 4px solid #3B6FE0;
@@ -68,9 +67,40 @@ st.markdown("""
     [data-testid="stSidebar"] * { color: #E2EAFF !important; }
     [data-testid="stSidebar"] .stSelectbox label,
     [data-testid="stSidebar"] .stMultiSelect label { color: #CBD5F0 !important; font-size:13px; }
-    [data-testid="stSidebarNav"] a { color: #CBD5F0 !important; }
+    [data-testid="stSidebarNav"] a { color: #CBD5F0 !important; } [data-testid="stAppViewContainer"] {
+        background: #F9FAFB;
+    }
+
+    div[data-baseweb="tab-list"] button[data-baseweb="tab"] p {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: #1E293B !important;
+        padding: 10px 20px !important;
+    }
+
+    div[data-baseweb="tab-list"] button[aria-selected="true"] p {
+        color: #1E3A6E !important;
+    }
+
+    /* Título principal */
+    h1 {
+        color: #0F172A !important;
+    }
+
+    /* Subtítulo / caption */
+    [data-testid="stCaptionContainer"] {
+        color: #334155 !important;
+    }
+
+    div[data-testid="stSelectbox"] div:has(select[id*="disc_saeb"]) + label,
+    div[data-testid="stSelectbox"] label:has(+ div select[id*="disc_saeb"]) {
+        font-size: 20px !important;
+        color: #000000 !important;
+        font-weight: 700;
+    }
 </style>
 """, unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────
 # CONSTANTES
@@ -133,13 +163,16 @@ def carregar_dados():
 
 df_full, saeb_br, saeb_uf, enem = carregar_dados()
 
-# ─────────────────────────────────────────────
-# SIDEBAR — filtros globais
-# ─────────────────────────────────────────────
+
+# SIDEBAR -------------------------------------
 with st.sidebar:
-    st.markdown("## 📊 Edumetricas")
+    st.markdown("""
+        <div style="font-size:35px; font-weight:700; margin-bottom:10px; margin-top:-40px; text-align:center;">
+        Edumetricas
+        </div>
+    """, unsafe_allow_html=True)
     st.markdown("---")
-    st.markdown("### Filtros")
+    st.markdown("# Filtros")
 
     series_opts  = ['Todas'] + sorted(df_full['serie'].unique().tolist())
     serie_sel    = st.selectbox("Série", series_opts)
@@ -157,35 +190,35 @@ with st.sidebar:
     faixa_sel    = st.selectbox("Faixa de desempenho", faixa_opts)
 
     st.markdown("---")
-    genero_sel   = st.multiselect("Gênero", ['F','M'], default=['F','M'])
 
-# Aplicar filtros
+
+# FILTROS -------------------------------------
 df = df_full.copy()
 if serie_sel  != 'Todas': df = df[df['serie']            == serie_sel]
 if turma_sel  != 'Todas': df = df[df['turma']            == turma_sel]
 if disc_sel   != 'Todas': df = df[df['disciplina']       == disc_sel]
 if faixa_sel  != 'Todas': df = df[df['faixa_desempenho'] == faixa_sel]
-if genero_sel:            df = df[df['genero'].isin(genero_sel)]
 
-# ─────────────────────────────────────────────
-# ABAS
-# ─────────────────────────────────────────────
+
+# NAVBAR --------------------------------------
 aba1, aba2, aba3, aba4 = st.tabs([
-    "🏫 Visão Geral",
-    "📚 Desempenho por Matéria",
-    "📈 Evolução Bimestral",
-    "🌐 Comparativo Nacional",
+    "Visão geral",
+    "Desempenho por matéria",
+    "Evolução bimestral",
+    "Estatísticas nacionais",
 ])
 
-# ══════════════════════════════════════════════
-# ABA 1 — VISÃO GERAL
-# ══════════════════════════════════════════════
-with aba1:
-    st.markdown("# Visão Geral da Escola")
-    filtro_desc = " · ".join(filter(lambda x: x != 'Todas', [serie_sel, turma_sel, disc_sel])) or "Escola completa"
-    st.caption(f"Filtro ativo: **{filtro_desc}**  —  {df['id_aluno'].nunique()} alunos · {len(df)} registros")
 
-    # ── KPIs
+# ABA 1: VISAO GERAL --------------------------
+with aba1:
+    st.markdown("# Visão geral do conjunto")
+    filtro_desc = " · ".join(filter(lambda x: x != 'Todas', [serie_sel, turma_sel, disc_sel])) or "Escola completa"
+    st.markdown(f"""
+        <div style="font-size:20px; color:#334155; margin-bottom:30px; margin-top:-15px;">
+            Filtro ativo: <b>{filtro_desc}</b> | {df['id_aluno'].nunique()} alunos · {len(df)} registros
+        </div>
+    """, unsafe_allow_html=True)
+
     col1, col2, col3, col4, col5 = st.columns(5)
     n_alunos   = df['id_aluno'].nunique()
     media_geral = df['media_anual'].mean()
@@ -197,74 +230,87 @@ with aba1:
 
     for col, label, val, sub in zip(
         [col1, col2, col3, col4, col5],
-        ['Alunos', 'Média Geral', 'Frequência Média', 'Em Risco', 'Taxa Aprovação'],
+        ['Alunos', 'Média Geral', 'Freq. Média', 'Em Risco', 'Tx. Aprovação'],
         [n_alunos, f"{media_geral:.2f}", f"{freq_media:.1f}%", em_risco, f"{pct_aprov:.1f}%"],
         ['registros únicos', 'escala 0–10', 'presença anual', 'nota ou frequência', 'no ano letivo']
     ):
         col.markdown(f"""
         <div class="metric-card">
-          <div class="label">{label}</div>
-          <div class="value">{val}</div>
-          <div class="sub">{sub}</div>
+            <div class="label">{label}</div>
+            <div class="value">{val}</div>
+            <div class="sub">{sub}</div>
         </div>""", unsafe_allow_html=True)
 
-    st.markdown('<div class="section-title">Faixas de Desempenho</div>', unsafe_allow_html=True)
-    c1, c2 = st.columns([1, 2])
+    st.markdown('<br />')
+
+    st.markdown('<div class="section-title">Desempenho por faixa e Médias por série e disciplina</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns([1, 1.8], vertical_alignment="top")
 
     with c1:
         faixas = df['faixa_desempenho'].value_counts().reindex(FAIXAS_ORDEM).fillna(0)
+
         fig_pizza = px.pie(
             values=faixas.values,
             names=faixas.index,
             color=faixas.index,
             color_discrete_map=CORES_FAIXAS,
-            hole=0.45,
+            hole=0.5,
         )
-        fig_pizza.update_traces(textposition='outside', textinfo='percent+label')
-        fig_pizza.update_layout(showlegend=False, margin=dict(t=20,b=20,l=20,r=20), height=300)
-        st.plotly_chart(fig_pizza, use_container_width=True)
+
+        fig_pizza.update_traces(
+            textposition='inside',
+            textinfo='percent+label',
+            textfont_size=20
+        )
+
+        fig_pizza.update_layout(
+            legend=dict(font=dict(size=14)),
+            margin=dict(t=20, b=10, l=20, r=20),
+            height=420
+        )
+
+        st.plotly_chart(fig_pizza, width='stretch')
 
     with c2:
-        faixas_disc = (
-            df.groupby(['disciplina','faixa_desempenho'])
-            .size().reset_index(name='n')
+        media_heatmap = (
+            df.groupby(['serie','disciplina'])['media_anual']
+            .mean().round(2).unstack()
         )
-        faixas_disc_pct = faixas_disc.copy()
-        total_disc = faixas_disc.groupby('disciplina')['n'].transform('sum')
-        faixas_disc_pct['pct'] = (faixas_disc_pct['n'] / total_disc * 100).round(1)
-        faixas_disc_pct['faixa_desempenho'] = pd.Categorical(
-            faixas_disc_pct['faixa_desempenho'], FAIXAS_ORDEM
+
+        fig_heat = px.imshow(
+            media_heatmap,
+            text_auto=True,
+            color_continuous_scale='RdYlGn',
+            zmin=0, zmax=10,
+            labels=dict(x='Disciplina', y='Série', color='Média'),
+            height=420,
         )
-        faixas_disc_pct = faixas_disc_pct.sort_values('faixa_desempenho')
 
-        fig_bar = px.bar(
-            faixas_disc_pct, x='disciplina', y='pct',
-            color='faixa_desempenho',
-            color_discrete_map=CORES_FAIXAS,
-            category_orders={'faixa_desempenho': FAIXAS_ORDEM},
-            labels={'pct': '%', 'disciplina': '', 'faixa_desempenho': 'Faixa'},
-            barmode='stack', height=300,
+        fig_heat.update_layout(
+            margin=dict(t=10, b=10),
+            font=dict(size=16),  # 🔥 aumenta texto geral
         )
-        fig_bar.update_layout(margin=dict(t=20,b=20), legend=dict(orientation='h', y=-0.25))
-        st.plotly_chart(fig_bar, use_container_width=True)
 
-    st.markdown('<div class="section-title">Médias por Série e Disciplina</div>', unsafe_allow_html=True)
-    media_heatmap = (
-        df.groupby(['serie','disciplina'])['media_anual']
-        .mean().round(2).unstack()
-    )
-    fig_heat = px.imshow(
-        media_heatmap,
-        text_auto=True,
-        color_continuous_scale='RdYlGn',
-        zmin=0, zmax=10,
-        labels=dict(x='Disciplina', y='Série', color='Média'),
-        height=220,
-    )
-    fig_heat.update_layout(margin=dict(t=10,b=10))
-    st.plotly_chart(fig_heat, use_container_width=True)
+        fig_heat.update_xaxes(
+            tickfont=dict(size=14),  # labels de X (Disciplina)
+            title_font=dict(size=16)
+        )
 
-    st.markdown('<div class="section-title">Situação dos Alunos</div>', unsafe_allow_html=True)
+        fig_heat.update_yaxes(
+            tickfont=dict(size=14),  # labels de Y (Série)
+            title_font=dict(size=16)
+        )
+
+        fig_heat.update_coloraxes(
+            colorbar_tickfont=dict(size=14),  # legenda da escala (Média)
+            colorbar_title_font=dict(size=16)
+        )
+
+        st.plotly_chart(fig_heat, width='stretch')
+
+    st.markdown('<br />')
+
+    st.markdown('<div class="section-title">Situação dos alunos</div>', unsafe_allow_html=True)
     sit = df.groupby(['disciplina','situacao']).size().reset_index(name='n')
     fig_sit = px.bar(
         sit, x='n', y='disciplina', color='situacao',
@@ -279,13 +325,15 @@ with aba1:
         labels={'n': 'Alunos', 'disciplina': '', 'situacao': 'Situação'},
     )
     fig_sit.update_layout(margin=dict(t=10,b=10), legend=dict(orientation='h', y=-0.3))
-    st.plotly_chart(fig_sit, use_container_width=True)
+    st.plotly_chart(fig_sit, width='stretch')
 
-    st.markdown('<div class="section-title">Alunos em Risco</div>', unsafe_allow_html=True)
+    st.markdown('<br />')
+
+    st.markdown('<div class="section-title">Alunos em risco</div>', unsafe_allow_html=True)
     df_risco = df[
         (df['media_anual'] < LIMITE_APROV) | (df['frequencia_anual'] < LIMITE_FREQ)
     ][['nome','serie','turma','disciplina','media_anual','frequencia_anual','situacao']]\
-     .sort_values('media_anual').drop_duplicates()
+        .sort_values('media_anual').drop_duplicates()
 
     st.dataframe(
         df_risco.rename(columns={
@@ -293,13 +341,11 @@ with aba1:
             'disciplina': 'Disciplina', 'media_anual': 'Média',
             'frequencia_anual': 'Frequência', 'situacao': 'Situação'
         }).style.format({'Média': '{:.2f}', 'Frequência': '{:.1%}'}),
-        use_container_width=True, height=280
+        width='stretch', height=280
     )
 
 
-# ══════════════════════════════════════════════
-# ABA 2 — DESEMPENHO POR MATÉRIA
-# ══════════════════════════════════════════════
+# ABA 2: DESEMPENHO POR MATERIA ---------------
 with aba2:
     st.markdown("# Desempenho por Matéria")
 
@@ -319,7 +365,7 @@ with aba2:
     c2.metric("Frequência Média",    f"{df2['frequencia_anual'].mean()*100:.1f}%")
     c3.metric("Taxa de Atividades",  f"{df2['taxa_atividades_anual'].mean()*100:.1f}%")
 
-    st.markdown('<div class="section-title">Distribuição das Notas</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Distribuição das notas</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
 
     with c1:
@@ -330,9 +376,9 @@ with aba2:
             title='Histograma de médias'
         )
         fig_hist.add_vline(x=LIMITE_APROV, line_dash='dash', line_color='red',
-                           annotation_text='Mínimo aprovação')
+                            annotation_text='Mínimo aprovação')
         fig_hist.update_layout(height=320, margin=dict(t=40,b=10))
-        st.plotly_chart(fig_hist, use_container_width=True)
+        st.plotly_chart(fig_hist, width='stretch')
 
     with c2:
         fig_box = px.box(
@@ -343,9 +389,9 @@ with aba2:
         )
         fig_box.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red')
         fig_box.update_layout(height=320, margin=dict(t=40,b=10), showlegend=False)
-        st.plotly_chart(fig_box, use_container_width=True)
+        st.plotly_chart(fig_box, width='stretch')
 
-    st.markdown('<div class="section-title">Notas por Prova e Bimestre</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Notas por prova e bimestre</div>', unsafe_allow_html=True)
     provas_cols = {
         'P1 — 1º Bim': 'nota_p1_b1', 'P2 — 1º Bim': 'nota_p2_b1',
         'P1 — 2º Bim': 'nota_p1_b2', 'P2 — 2º Bim': 'nota_p2_b2',
@@ -361,12 +407,12 @@ with aba2:
         textposition='outside',
     ))
     fig_provas.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red',
-                         annotation_text='Mínimo aprovação')
+                            annotation_text='Mínimo aprovação')
     fig_provas.update_layout(height=320, margin=dict(t=10,b=10),
-                              yaxis=dict(range=[0,11]))
-    st.plotly_chart(fig_provas, use_container_width=True)
+                                yaxis=dict(range=[0,11]))
+    st.plotly_chart(fig_provas, width='stretch')
 
-    st.markdown('<div class="section-title">Desempenho por Turma</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Desempenho por turma</div>', unsafe_allow_html=True)
     media_turma = (
         df2.groupby('turma')['media_anual'].mean().round(2).reset_index()
     )
@@ -381,33 +427,13 @@ with aba2:
     fig_turma.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red')
     fig_turma.update_traces(texttemplate='%{text:.2f}', textposition='outside')
     fig_turma.update_layout(height=320, margin=dict(t=10,b=10),
-                             coloraxis_showscale=False, yaxis=dict(range=[0,11]))
-    st.plotly_chart(fig_turma, use_container_width=True)
-
-    st.markdown('<div class="section-title">Relação Frequência × Nota</div>', unsafe_allow_html=True)
-    fig_scatter = px.scatter(
-        df2, x='frequencia_anual', y='media_anual',
-        color='faixa_desempenho',
-        color_discrete_map=CORES_FAIXAS,
-        hover_data=['nome','turma','serie'],
-        labels={
-            'frequencia_anual': 'Frequência Anual',
-            'media_anual': 'Média Anual',
-            'faixa_desempenho': 'Faixa',
-        },
-        opacity=0.65,
-    )
-    fig_scatter.add_hline(y=LIMITE_APROV,  line_dash='dash', line_color='red',   annotation_text='Mínimo nota')
-    fig_scatter.add_vline(x=LIMITE_FREQ,   line_dash='dash', line_color='orange', annotation_text='Mínimo frequência')
-    fig_scatter.update_layout(height=380, margin=dict(t=10,b=10))
-    st.plotly_chart(fig_scatter, use_container_width=True)
+                                coloraxis_showscale=False, yaxis=dict(range=[0,11]))
+    st.plotly_chart(fig_turma, width='stretch')
 
 
-# ══════════════════════════════════════════════
-# ABA 3 — EVOLUÇÃO BIMESTRAL
-# ══════════════════════════════════════════════
+# ABA 3: EVOLUÇÃO BIMESTRAL -------------------
 with aba3:
-    st.markdown("# Evolução Bimestral")
+    st.markdown("# Evolução bimestral")
 
     c1, c2 = st.columns(2)
     with c1:
@@ -457,16 +483,15 @@ with aba3:
     )
     if metrica == 'Média das notas':
         fig_ev.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red',
-                         annotation_text='Mínimo aprovação')
+                            annotation_text='Mínimo aprovação')
     else:
         fig_ev.add_hline(y=LIMITE_FREQ*100, line_dash='dash', line_color='orange',
-                         annotation_text='75% mínimo')
+                            annotation_text='75% mínimo')
     fig_ev.update_traces(line=dict(width=2.5), marker=dict(size=8))
     fig_ev.update_layout(height=420, margin=dict(t=20,b=10))
-    st.plotly_chart(fig_ev, use_container_width=True)
+    st.plotly_chart(fig_ev, width='stretch')
 
-    # Tabela de variação entre bimestres
-    st.markdown('<div class="section-title">Variação entre Bimestres</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Variação entre bimestres</div>', unsafe_allow_html=True)
 
     if agrup == 'Escola toda':
         pivot = ev.set_index('Bimestre')[ylabel].to_frame().T
@@ -474,9 +499,9 @@ with aba3:
     else:
         pivot = ev.pivot(index='Grupo', columns='Bimestre', values=ylabel)[BIMESTRES]
 
-    pivot['Δ 1→2'] = (pivot['2º Bim'] - pivot['1º Bim']).round(2)
-    pivot['Δ 2→3'] = (pivot['3º Bim'] - pivot['2º Bim']).round(2)
-    pivot['Δ 3→4'] = (pivot['4º Bim'] - pivot['3º Bim']).round(2)
+    pivot['Dif. 1° → 2°'] = (pivot['2º Bim'] - pivot['1º Bim']).round(2)
+    pivot['Dif.  2° → 3°'] = (pivot['3º Bim'] - pivot['2º Bim']).round(2)
+    pivot['Dif. 3° → 4°'] = (pivot['4º Bim'] - pivot['3º Bim']).round(2)
 
     def color_delta(val):
         if isinstance(val, float):
@@ -485,8 +510,8 @@ with aba3:
         return ''
 
     st.dataframe(
-        pivot.round(2).style.map(color_delta, subset=['Δ 1→2','Δ 2→3','Δ 3→4']),
-        use_container_width=True
+        pivot.round(2).style.map(color_delta, subset=['Dif. 1° → 2°', 'Dif.  2° → 3°', 'Dif. 3° → 4°']),
+        width='stretch'
     )
 
     # Comparação entre duas turmas
@@ -517,14 +542,14 @@ with aba3:
         fig_comp.add_hline(y=LIMITE_APROV, line_dash='dash', line_color='red')
     fig_comp.update_layout(height=340, margin=dict(t=10,b=10),
                             yaxis_title=ylabel)
-    st.plotly_chart(fig_comp, use_container_width=True)
+    st.plotly_chart(fig_comp, width='stretch')
 
 
 # ══════════════════════════════════════════════
 # ABA 4 — COMPARATIVO NACIONAL
 # ══════════════════════════════════════════════
 with aba4:
-    st.markdown("# Comparativo Nacional — SAEB & ENEM")
+    st.markdown("# Estatísticas nacionais")
     st.caption(f"Dados SAEB: 3º ano do Ensino Médio · UF da escola: **{UF_ESCOLA}**")
 
     # ── SAEB
@@ -560,7 +585,7 @@ with aba4:
         yaxis_title='Proficiência média (escala SAEB)',
         legend=dict(orientation='h', y=-0.2)
     )
-    st.plotly_chart(fig_saeb, use_container_width=True)
+    st.plotly_chart(fig_saeb, width='stretch')
 
     # Distribuição de níveis SAEB
     st.markdown('<div class="section-title">SAEB — Distribuição de níveis (2023)</div>',
@@ -610,7 +635,7 @@ with aba4:
         legend=dict(orientation='h', y=-0.2),
         xaxis=dict(tickvals=x, ticktext=[str(i) for i in x])
     )
-    st.plotly_chart(fig_niv, use_container_width=True)
+    st.plotly_chart(fig_niv, width='stretch')
 
     # ── ENEM
     st.markdown('<div class="section-title">ENEM 2024 — Escola vs Nacional</div>',
@@ -651,7 +676,7 @@ with aba4:
         yaxis_title='% de alunos',
         legend=dict(orientation='h', y=-0.2)
     )
-    st.plotly_chart(fig_enem, use_container_width=True)
+    st.plotly_chart(fig_enem, width='stretch')
 
     # Resumo comparativo
     st.markdown('<div class="section-title">Resumo Comparativo</div>', unsafe_allow_html=True)
@@ -688,6 +713,6 @@ with aba4:
 
     st.dataframe(
         df_comp_tab,
-        use_container_width=True,
+        width='stretch',
         hide_index=True
     )
